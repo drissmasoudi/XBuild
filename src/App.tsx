@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Index from "@/pages/Index";
 import AuthPage from "@/pages/AuthPage";
 import AppPage from "@/pages/AppPage";
 import QuoteEditorPage from "@/pages/QuoteEditorPage";
+import { SplashScreen } from "@/components/SplashScreen";
 import { useAuth } from "@/hooks/useAuth";
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
@@ -13,7 +15,18 @@ function ProtectedRoute({ children }: { children: JSX.Element }) {
   return children;
 }
 
+const alreadyShown = sessionStorage.getItem("splash_shown");
+
 export default function App() {
+  const [showSplash, setShowSplash] = useState(!alreadyShown);
+
+  const handleSplashDone = () => {
+    sessionStorage.setItem("splash_shown", "1");
+    setShowSplash(false);
+  };
+
+  if (showSplash) return <SplashScreen onDone={handleSplashDone} />;
+
   return (
     <Routes>
       <Route path="/" element={<Index />} />
