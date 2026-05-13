@@ -1625,3 +1625,180 @@ tr:hover .row-delete-btn { color: var(--text-muted); }
 }
 
 .row-listino-btn:hover { color: var(--brand); background: rgba(255,106,0,0.1); }
+
+/* ===== Safe areas + Mobile responsive ===== */
+
+/* Safe area CSS variables — 0px fallback on desktop/non-notch devices */
+:root {
+  --sat: env(safe-area-inset-top,    0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left,   0px);
+  --sar: env(safe-area-inset-right,  0px);
+}
+
+/* Push content below notch / Dynamic Island on all devices */
+.app-navbar {
+  height: calc(60px + var(--sat));
+  padding-top: var(--sat);
+  padding-left:  calc(24px + var(--sal));
+  padding-right: calc(24px + var(--sar));
+}
+
+.editor-navbar {
+  height: calc(60px + var(--sat));
+  padding-top: var(--sat);
+  padding-left:  calc(20px + var(--sal));
+  padding-right: calc(20px + var(--sar));
+}
+
+/* Home indicator clearance */
+.editor-summary {
+  padding-bottom: calc(0px + var(--sab));
+}
+
+/* ---- Tablet (≤ 900px) ---- */
+@media (max-width: 900px) {
+  .app-navbar-left,
+  .app-navbar-right { min-width: auto; }
+
+  .app-content { padding: 28px 20px; }
+
+  .editor-title-input { width: 220px; }
+}
+
+/* ---- Mobile (≤ 640px) ---- */
+@media (max-width: 640px) {
+
+  /* --- App navbar --- */
+  .app-navbar {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: calc(56px + var(--sat));
+    padding-bottom: 8px;
+    gap: 8px;
+  }
+
+  /* Hide email label — keep only avatar */
+  .app-user-email  { display: none; }
+  .app-user-btn    { padding: 4px 6px; }
+
+  /* Nav labels hidden — icons only */
+  .nav-label { display: none; }
+  .app-nav-item { padding: 8px 10px; }
+  .app-nav   { gap: 2px; }
+
+  /* --- App content --- */
+  .app-content { padding: 16px 14px; }
+
+  /* --- Quotes grid: single column --- */
+  .quotes-grid,
+  .quotes-loading { grid-template-columns: 1fr; }
+
+  .quotes-header h1 { font-size: 1.4rem; }
+
+  /* --- Editor navbar: two rows --- */
+  .editor-navbar {
+    display: flex;
+    flex-wrap: wrap;
+    height: auto;
+    min-height: calc(56px + var(--sat));
+    padding-bottom: 10px;
+    gap: 8px;
+  }
+
+  .editor-navbar-left  { flex: 1; min-width: 0; }
+  .editor-navbar-right { flex: 1; justify-content: flex-end; gap: 6px; }
+  .editor-navbar-center {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+    padding: 0 2px;
+  }
+
+  .editor-title-input {
+    width: 100%;
+    font-size: 14px;
+    text-align: left;
+  }
+
+  /* Hide divider and logo in editor navbar on mobile */
+  .editor-divider { display: none; }
+  .editor-navbar-left .logo { display: none; }
+
+  /* Hide "Preventivi" text in back button */
+  .editor-back-btn span { display: none; }
+
+  /* Editor body */
+  .editor-body { padding: 16px 12px; gap: 16px; }
+
+  /* Table: horizontal scroll */
+  .editor-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 10px;
+  }
+
+  /* Hide margin and listino columns on small screens */
+  .col-margin, .col-listino,
+  .editor-table th.col-margin,
+  .editor-table th.col-listino { display: none; }
+
+  /* Summary: full width */
+  .editor-summary {
+    align-self: stretch;
+    min-width: 0;
+    padding-bottom: calc(12px + var(--sab));
+  }
+
+  /* Meta bar */
+  .editor-meta-bar { padding: 10px 14px; }
+  .editor-meta-input { min-width: 0; flex: 1; }
+
+  /* --- Modals: bottom sheet --- */
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-card {
+    max-width: 100%;
+    width: 100%;
+    border-radius: 20px 20px 0 0;
+    padding-bottom: calc(28px + var(--sab));
+    animation: slideUp 250ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .import-preview-card,
+  .price-picker-card {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 20px 20px 0 0;
+    max-height: 88vh;
+    padding-bottom: calc(0px + var(--sab));
+    animation: slideUp 250ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  /* --- Listino table --- */
+  .listino-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Hide category column on small screens */
+  .lt-col-cat { display: none; }
+
+  /* --- Settings --- */
+  .settings-page { max-width: 100%; }
+  .settings-card-header { padding: 16px 18px 12px; }
+  .settings-form { padding: 16px 18px; }
+  .settings-card-footer { padding: 12px 18px; }
+
+  /* --- Auth page --- */
+  .auth-card { padding: 24px 20px; }
+}
+
+/* Bottom sheet slide-up animation */
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}

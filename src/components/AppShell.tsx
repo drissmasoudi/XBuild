@@ -43,9 +43,10 @@ export function AppShell({ section, onSectionChange, children }: AppShellProps) 
               key={id}
               className={`app-nav-item ${section === id ? "active" : ""}`}
               onClick={() => onSectionChange(id)}
+              title={label}
             >
               <Icon size={15} />
-              {label}
+              <span className="nav-label">{label}</span>
             </button>
           ))}
         </nav>
