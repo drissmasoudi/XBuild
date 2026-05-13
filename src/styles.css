@@ -2084,3 +2084,136 @@ tr:hover .row-delete-btn { color: var(--text-muted); }
   from { transform: translateY(100%); opacity: 0; }
   to   { transform: translateY(0);    opacity: 1; }
 }
+
+/* ===== Theme toggle button ===== */
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 150ms, color 150ms, border-color 150ms;
+  flex-shrink: 0;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(255, 106, 0, 0.1);
+  color: var(--brand);
+  border-color: rgba(255, 106, 0, 0.3);
+}
+
+/* ===== Light theme ===== */
+[data-theme="light"] {
+  color-scheme: light;
+  --bg-0: #f0f2f5;
+  --bg-1: #ffffff;
+  --bg-2: #e8ecf0;
+  --border: rgba(15, 23, 42, 0.10);
+  --border-strong: rgba(15, 23, 42, 0.18);
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --danger: #dc2626;
+  --success: #16a34a;
+}
+
+[data-theme="light"] body {
+  background: #f0f2f5;
+}
+
+[data-theme="light"] .app-layout,
+[data-theme="light"] .editor-layout { background: var(--bg-0); }
+
+[data-theme="light"] .app-navbar,
+[data-theme="light"] .editor-navbar {
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom-color: var(--border);
+}
+
+[data-theme="light"] .app-nav-item { color: var(--text-muted); }
+[data-theme="light"] .app-nav-item:hover { background: rgba(15, 23, 42, 0.05); color: var(--text); }
+[data-theme="light"] .app-nav-item.active { background: rgba(255, 106, 0, 0.10); }
+
+[data-theme="light"] .app-user-btn { border-color: var(--border-strong); color: var(--text); }
+[data-theme="light"] .app-user-btn:hover { background: rgba(15, 23, 42, 0.04); }
+[data-theme="light"] .app-user-dropdown { background: #fff; border-color: var(--border-strong); }
+[data-theme="light"] .app-user-dropdown-item { color: var(--text); }
+
+[data-theme="light"] .app-bottom-nav {
+  background: rgba(255, 255, 255, 0.97);
+  border-top-color: var(--border);
+}
+
+[data-theme="light"] .quote-card { background: #ffffff; border-color: var(--border); }
+[data-theme="light"] .quote-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-color: rgba(255,106,0,0.3); }
+[data-theme="light"] .quote-card.skeleton { background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; }
+
+[data-theme="light"] .modal-card,
+[data-theme="light"] .import-preview-card,
+[data-theme="light"] .price-picker-card { background: #ffffff; border-color: var(--border-strong); }
+
+[data-theme="light"] .auth-card { background: rgba(255,255,255,0.97); border-color: var(--border-strong); }
+
+[data-theme="light"] .settings-card { background: #ffffff; border-color: var(--border); }
+
+[data-theme="light"] .editor-table thead tr { background: #f8fafc; }
+[data-theme="light"] .editor-table-wrap { border-color: var(--border); }
+[data-theme="light"] .editor-table tbody tr:hover { background: rgba(15, 23, 42, 0.02); }
+[data-theme="light"] .editor-table tbody tr { border-color: var(--border); }
+[data-theme="light"] .editor-meta-bar { background: #ffffff; border-bottom-color: var(--border); }
+[data-theme="light"] .editor-summary { background: #ffffff; border-color: var(--border); }
+[data-theme="light"] .editor-add-row { background: #fafafa; border-top-color: var(--border); color: var(--text-muted); }
+[data-theme="light"] .editor-add-row:hover { background: rgba(255,106,0,0.04); }
+[data-theme="light"] .editor-table tbody tr { background: #ffffff; border-color: var(--border); }
+[data-theme="light"] .summary-total { background: rgba(255,106,0,0.06); }
+
+[data-theme="light"] .cell-input { color: var(--text); }
+[data-theme="light"] .cell-input:hover { border-color: var(--border-strong); }
+[data-theme="light"] .cell-input:focus { background: rgba(255,106,0,0.05); }
+[data-theme="light"] .editor-title-input { color: var(--text); }
+[data-theme="light"] .editor-title-input:hover,
+[data-theme="light"] .editor-title-input:focus { background: rgba(15,23,42,0.05); }
+[data-theme="light"] .editor-meta-input { color: var(--text); }
+[data-theme="light"] .editor-status-select { background: #f8fafc; color: var(--text); border-color: var(--border-strong); }
+[data-theme="light"] .editor-back-btn { color: var(--text-muted); }
+[data-theme="light"] .editor-back-btn:hover { background: rgba(15,23,42,0.05); color: var(--text); }
+
+[data-theme="light"] .modal-form input,
+[data-theme="light"] .settings-field input,
+[data-theme="light"] .auth-form input,
+[data-theme="light"] .auth-card input {
+  background: #f8fafc;
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+[data-theme="light"] .listino-table-wrap { background: #ffffff; border-color: var(--border); }
+[data-theme="light"] .listino-table thead tr { background: #f8fafc; }
+[data-theme="light"] .listino-row { border-bottom-color: var(--border); }
+[data-theme="light"] .listino-row:hover { background: rgba(15,23,42,0.02); }
+[data-theme="light"] .listino-editing-row { background: rgba(255,106,0,0.04); }
+[data-theme="light"] .listino-add-row { background: rgba(255,106,0,0.03); }
+[data-theme="light"] .lt-cell-input { background: #f8fafc; color: var(--text); border-color: var(--border-strong); }
+[data-theme="light"] .listino-search { background: #f8fafc; color: var(--text); border-color: var(--border-strong); }
+[data-theme="light"] .listino-row,
+[data-theme="light"] .listino-editing-row,
+[data-theme="light"] .listino-add-row { background: #ffffff; border-color: var(--border) !important; }
+
+[data-theme="light"] .price-picker-search { background: #f8fafc; color: var(--text); border-color: var(--border-strong); }
+[data-theme="light"] .price-picker-row:hover { background: rgba(255,106,0,0.05); }
+[data-theme="light"] .price-picker-list { border-top-color: var(--border); }
+
+[data-theme="light"] .btn-ghost { color: var(--text); border-color: var(--border-strong); }
+[data-theme="light"] .btn-ghost:hover { background: rgba(15,23,42,0.06); }
+
+[data-theme="light"] .upload-zone { border-color: var(--border-strong); }
+
+[data-theme="light"] .editor-parse-error { background: rgba(220,38,38,0.08); border-color: rgba(220,38,38,0.2); }
+[data-theme="light"] .ai-loading-bar { background: rgba(255,106,0,0.07); border-color: rgba(255,106,0,0.18); }
+
+[data-theme="light"] .import-preview-table th { background: #f8fafc; border-color: var(--border); }
+[data-theme="light"] .import-preview-table td { border-color: var(--border); color: var(--text); }

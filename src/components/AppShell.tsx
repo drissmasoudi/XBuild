@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FileText, List, Settings, LogOut, ChevronDown } from "lucide-react";
+import { FileText, List, Settings, LogOut, ChevronDown, Sun, Moon } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "@/hooks/useTheme";
 
 export type AppSection = "preventivi" | "listino" | "impostazioni";
 
@@ -22,6 +23,7 @@ export function AppShell({ section, onSectionChange, children }: AppShellProps) 
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { theme, toggle: toggleTheme } = useTheme();
 
   const handleLogout = async () => {
     await signOut();
@@ -53,6 +55,9 @@ export function AppShell({ section, onSectionChange, children }: AppShellProps) 
         </nav>
 
         <div className="app-navbar-right">
+          <button className="theme-toggle-btn" onClick={toggleTheme} title={theme === "dark" ? "Modalità giorno" : "Modalità notte"}>
+            {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+          </button>
           <div className="app-user-menu">
             <button
               className="app-user-btn"
