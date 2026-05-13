@@ -3,12 +3,18 @@ export type QuoteStatus = "bozza" | "inviato" | "approvato" | "rifiutato";
 export interface Quote {
   id: string;
   user_id: string;
+  number: number;
   title: string;
   client_name: string | null;
   status: QuoteStatus;
   total: number;
   created_at: string;
   updated_at: string;
+}
+
+export function formatQuoteNumber(quote: Pick<Quote, "number" | "created_at">): string {
+  const year = new Date(quote.created_at).getFullYear();
+  return `PRV-${year}-${String(quote.number).padStart(3, "0")}`;
 }
 
 export type NewQuote = Pick<Quote, "title" | "client_name">;

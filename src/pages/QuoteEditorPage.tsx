@@ -12,6 +12,7 @@ import { QuotePdf } from "@/components/quotes/QuotePdf";
 import { PricePicker } from "@/components/listino/PricePicker";
 import { parseExcelFile, parsePdfViaAI, parsedRowToItem } from "@/lib/parseExcel";
 import type { PriceItem, QuoteStatus } from "@/types/quote";
+import { formatQuoteNumber } from "@/types/quote";
 import type { ParsedRow } from "@/lib/parseExcel";
 
 const STATUS_OPTIONS: { value: QuoteStatus; label: string }[] = [
@@ -114,10 +115,13 @@ export default function QuoteEditorPage() {
       <header className="editor-navbar">
         <div className="editor-navbar-left">
           <button className="editor-back-btn" onClick={() => navigate("/app")}>
-            <ArrowLeft size={16} /> Preventivi
+            <ArrowLeft size={16} /> <span>Preventivi</span>
           </button>
           <div className="editor-divider" />
           <Logo size="sm" />
+          {quote.number && (
+            <span className="editor-quote-number">{formatQuoteNumber(quote)}</span>
+          )}
         </div>
 
         <div className="editor-navbar-center">

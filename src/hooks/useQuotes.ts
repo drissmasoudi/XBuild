@@ -42,5 +42,35 @@ export function useQuotes() {
     setQuotes((prev) => prev.filter((q) => q.id !== id));
   };
 
-  return { quotes, loading, error, createQuote, deleteQuote, refetch: fetchQuotes };
+  const duplicateQuote = async (id: string): Promise<Quote | null> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    const [{ data: original }, { data: originalItems }] = await Promise.all([
+      supabase.from("quotes").select("*").eq("id", id).single(),
+      supabase.from("quote_items").select("*").eq("quote_id", id).order("position"),
+    ]);
+    if (!original) return null;
+
+    const { data: newQuote, error } = await supabase
+      .from("quotes")
+      .insert({ user_id: user.id, title: `${original.title} (copia)`, client_name: original.client_name, status: "bozza", total: 0 })
+      .select()
+      .single();
+    if (error || !newQuote) { setError(error?.message ?? "Errore duplica"); return null; }
+
+    if (originalItems?.length) {
+      await supabase.from("quote_items").insert(
+        originalItems.map(({ id: _id, quote_id: _qid, ...item }) => ({ ...item, quote_id: newQuote.id }))
+      );
+      const total = originalItems.reduce((s, i) => s + i.quantity * i.unit_price * (1 + i.margin / 100), 0);
+      await supabase.from("quotes").update({ total }).eq("id", newQuote.id);
+      newQuote.total = total;
+    }
+
+    setQuotes((prev) => [newQuote, ...prev]);
+    return newQuote;
+  };
+
+  return { quotes, loading, error, createQuote, deleteQuote, duplicateQuote, refetch: fetchQuotes };
 }

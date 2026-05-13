@@ -7,6 +7,7 @@ import {
   Font,
 } from "@react-pdf/renderer";
 import type { Quote, QuoteItem } from "@/types/quote";
+import { formatQuoteNumber } from "@/types/quote";
 import type { Profile } from "@/hooks/useProfile";
 
 Font.register({
@@ -121,7 +122,9 @@ export function QuotePdf({ quote, items, profile }: Props) {
           </View>
           <View style={s.headerRight}>
             <Text style={s.docTitle}>{quote.title}</Text>
-            <Text style={s.docDate}>{today}</Text>
+            <Text style={s.docDate}>
+              {quote.number ? `${formatQuoteNumber(quote)}  ·  ` : ""}{today}
+            </Text>
           </View>
         </View>
 

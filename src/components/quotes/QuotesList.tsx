@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Trash2, FileText, Calendar, User } from "lucide-react";
+import { Plus, Trash2, FileText, Calendar, User, Copy } from "lucide-react";
 import { useQuotes } from "@/hooks/useQuotes";
 import { NewQuoteModal } from "./NewQuoteModal";
 import type { NewQuote, Quote, QuoteStatus } from "@/types/quote";
+import { formatQuoteNumber } from "@/types/quote";
 
 const STATUS_LABELS: Record<QuoteStatus, string> = {
   bozza:     "Bozza",
@@ -28,14 +29,16 @@ function formatCurrency(n: number) {
 }
 
 export function QuotesList() {
-  const { quotes, loading, error, createQuote, deleteQuote } = useQuotes();
-  const [showModal, setShowModal] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const { quotes, loading, error, createQuote, deleteQuote, duplicateQuote } = useQuotes();
+  const [showModal, setShowModal]       = useState(false);
+  const [deletingId, setDeletingId]     = useState<string | null>(null);
+  const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleCreate = async (input: NewQuote) => {
-    await createQuote(input);
+    const q = await createQuote(input);
     setShowModal(false);
+    if (q) navigate(`/app/quotes/${q.id}`);
   };
 
   const handleDelete = async (q: Quote) => {
@@ -43,6 +46,13 @@ export function QuotesList() {
     setDeletingId(q.id);
     await deleteQuote(q.id);
     setDeletingId(null);
+  };
+
+  const handleDuplicate = async (q: Quote) => {
+    setDuplicatingId(q.id);
+    const newQ = await duplicateQuote(q.id);
+    setDuplicatingId(null);
+    if (newQ) navigate(`/app/quotes/${newQ.id}`);
   };
 
   return (
@@ -81,17 +91,32 @@ export function QuotesList() {
           {quotes.map((q) => (
             <div key={q.id} className="quote-card">
               <div className="quote-card-top">
-                <span className={`badge ${STATUS_CLASS[q.status]}`}>
-                  {STATUS_LABELS[q.status]}
-                </span>
-                <button
-                  className="quote-delete-btn"
-                  onClick={() => handleDelete(q)}
-                  disabled={deletingId === q.id}
-                  title="Elimina"
-                >
-                  <Trash2 size={14} />
-                </button>
+                <div className="quote-card-top-left">
+                  <span className={`badge ${STATUS_CLASS[q.status]}`}>
+                    {STATUS_LABELS[q.status]}
+                  </span>
+                  {q.number && (
+                    <span className="quote-number">{formatQuoteNumber(q)}</span>
+                  )}
+                </div>
+                <div className="quote-card-actions">
+                  <button
+                    className="quote-action-btn"
+                    onClick={() => handleDuplicate(q)}
+                    disabled={duplicatingId === q.id}
+                    title="Duplica"
+                  >
+                    <Copy size={13} />
+                  </button>
+                  <button
+                    className="quote-action-btn quote-delete-btn"
+                    onClick={() => handleDelete(q)}
+                    disabled={deletingId === q.id}
+                    title="Elimina"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
               </div>
 
               <h3 className="quote-card-title">{q.title}</h3>
