@@ -40,9 +40,11 @@ export default function QuoteEditorPage() {
   const [aiLoading, setAiLoading]         = useState(false);
   const [exporting, setExporting]         = useState(false);
   const [pickerForRow, setPickerForRow]   = useState<string | null>(null);
+  const [rowVersions, setRowVersions]     = useState<Record<string, number>>({});
 
   const handlePickPrice = (rowId: string, price: PriceItem) => {
     updateItem(rowId, { description: price.description, unit: price.unit, unit_price: price.unit_price });
+    setRowVersions((v) => ({ ...v, [rowId]: (v[rowId] ?? 0) + 1 }));
     setPickerForRow(null);
   };
 
@@ -199,7 +201,7 @@ export default function QuoteEditorPage() {
             </thead>
             <tbody>
               {items.map((item) => (
-                <tr key={item.id}>
+                <tr key={`${item.id}-${rowVersions[item.id] ?? 0}`}>
                   <td className="col-desc">
                     <input
                       className="cell-input"

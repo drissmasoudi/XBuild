@@ -18,7 +18,7 @@ export function useQuoteEditor(quoteId: string) {
       supabase.from("quotes").select("*").eq("id", quoteId).single(),
       supabase.from("quote_items").select("*").eq("quote_id", quoteId).order("position"),
     ]);
-    if (qErr) setError(qErr.message);
+    if (qErr || itErr) setError((qErr ?? itErr)!.message);
     else { setQuote(q); setItems(it ?? []); }
     setLoading(false);
   }, [quoteId]);

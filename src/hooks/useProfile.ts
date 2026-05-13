@@ -35,7 +35,7 @@ export function useProfile() {
       .eq("id", user.id)
       .maybeSingle();
 
-    if (error) setError(error.message);
+    if (error) { setError(error.message); setLoading(false); return; }
     setProfile(data ?? { id: user.id, ...EMPTY });
     setLoading(false);
   }, []);
