@@ -1686,6 +1686,7 @@ tr:hover .row-delete-btn { color: var(--text-muted); }
   --sab: env(safe-area-inset-bottom, 0px);
   --sal: env(safe-area-inset-left,   0px);
   --sar: env(safe-area-inset-right,  0px);
+  --bottom-nav-h: 0px; /* overridden on mobile */
 }
 
 /* Push content below notch / Dynamic Island on all devices */
@@ -1703,9 +1704,9 @@ tr:hover .row-delete-btn { color: var(--text-muted); }
   padding-right: calc(20px + var(--sar));
 }
 
-/* Home indicator clearance */
-.editor-summary {
-  padding-bottom: calc(0px + var(--sab));
+/* ===== Bottom Navigation Bar ===== */
+.app-bottom-nav {
+  display: none; /* shown only on mobile */
 }
 
 /* ---- Tablet (≤ 900px) ---- */
@@ -1720,42 +1721,103 @@ tr:hover .row-delete-btn { color: var(--text-muted); }
 
 /* ---- Mobile (≤ 640px) ---- */
 @media (max-width: 640px) {
-
-  /* --- App navbar --- */
-  .app-navbar {
-    flex-wrap: wrap;
-    height: auto;
-    min-height: calc(56px + var(--sat));
-    padding-bottom: 8px;
-    gap: 8px;
+  :root {
+    --bottom-nav-h: 64px;
   }
 
-  /* Hide email label — keep only avatar */
+  /* ===== Bottom Nav ===== */
+  .app-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    background: rgba(5, 6, 11, 0.96);
+    border-top: 1px solid var(--border-strong);
+    backdrop-filter: blur(16px);
+    padding-bottom: var(--sab);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .app-bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 56px;
+    padding: 8px 4px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: color 150ms;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .app-bottom-nav-item.active {
+    color: var(--brand);
+  }
+
+  .app-bottom-nav-item svg {
+    transition: transform 150ms;
+  }
+
+  .app-bottom-nav-item.active svg {
+    transform: scale(1.1);
+  }
+
+  /* Hide desktop nav on mobile */
+  .app-nav-desktop { display: none; }
+
+  /* Add space so content isn't hidden behind bottom nav */
+  .app-content {
+    padding: 16px 14px calc(var(--bottom-nav-h) + var(--sab) + 16px);
+  }
+
+  /* Compact top navbar on mobile */
+  .app-navbar {
+    height: calc(52px + var(--sat));
+    padding-left:  calc(16px + var(--sal));
+    padding-right: calc(16px + var(--sar));
+  }
+
+  /* Hide email — keep only avatar */
   .app-user-email  { display: none; }
-  .app-user-btn    { padding: 4px 6px; }
+  .app-user-btn    { padding: 6px 8px; min-height: 40px; }
 
-  /* Nav labels hidden — icons only */
-  .nav-label { display: none; }
-  .app-nav-item { padding: 8px 10px; }
-  .app-nav   { gap: 2px; }
-
-  /* --- App content --- */
-  .app-content { padding: 16px 14px; }
-
-  /* --- Quotes grid: single column --- */
+  /* ===== Quotes page ===== */
   .quotes-grid,
   .quotes-loading { grid-template-columns: 1fr; }
 
   .quotes-header h1 { font-size: 1.4rem; }
+  .quotes-header { gap: 12px; }
 
-  /* --- Editor navbar: two rows --- */
+  /* Bigger touch area for quote cards */
+  .quote-card { padding: 16px; }
+
+  .quote-action-btn {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 8px;
+    justify-content: center;
+  }
+
+  .quote-card-footer .btn { min-height: 40px; padding: 8px 16px; }
+
+  /* ===== Editor navbar ===== */
   .editor-navbar {
     display: flex;
     flex-wrap: wrap;
     height: auto;
-    min-height: calc(56px + var(--sat));
+    min-height: calc(52px + var(--sat));
     padding-bottom: 10px;
-    gap: 8px;
+    gap: 6px;
   }
 
   .editor-navbar-left  { flex: 1; min-width: 0; }
@@ -1769,44 +1831,140 @@ tr:hover .row-delete-btn { color: var(--text-muted); }
 
   .editor-title-input {
     width: 100%;
-    font-size: 14px;
+    font-size: 15px;
+    font-weight: 600;
     text-align: left;
   }
 
-  /* Hide divider and logo in editor navbar on mobile */
   .editor-divider { display: none; }
   .editor-navbar-left .logo { display: none; }
-
-  /* Hide "Preventivi" text in back button */
   .editor-back-btn span { display: none; }
+  .editor-back-btn { min-width: 40px; min-height: 40px; justify-content: center; }
 
-  /* Editor body */
-  .editor-body { padding: 16px 12px; gap: 16px; }
+  /* Bigger navbar buttons */
+  .editor-navbar .btn { min-height: 40px; font-size: 13px; }
+  .editor-status-select { min-height: 40px; font-size: 13px; }
 
-  /* Table: horizontal scroll */
+  /* ===== Editor body ===== */
+  .editor-body { padding: 12px 12px calc(var(--bottom-nav-h) + var(--sab) + 16px); gap: 14px; }
+
+  .editor-meta-bar { padding: 10px 14px; }
+  .editor-meta-input { min-width: 0; flex: 1; min-height: 40px; }
+
+  /* ===== Editor table → Card stack on mobile ===== */
   .editor-table-wrap {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius: 10px;
+    overflow-x: visible;
+    border: none;
+    background: transparent;
+    border-radius: 0;
   }
 
-  /* Hide margin and listino columns on small screens */
-  .col-margin, .col-listino,
-  .editor-table th.col-margin,
-  .editor-table th.col-listino { display: none; }
+  .editor-table { display: block; }
+  .editor-table thead { display: none; }
 
-  /* Summary: full width */
+  .editor-table tbody { display: flex; flex-direction: column; gap: 10px; }
+
+  .editor-table tbody tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto auto;
+    grid-template-rows: auto auto;
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px;
+    gap: 6px 8px;
+  }
+
+  /* Description — full width, row 1 */
+  .editor-table td.col-desc {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    padding: 0;
+  }
+
+  /* Qty — row 2, col 1 */
+  .editor-table td.col-qty {
+    grid-column: 1;
+    grid-row: 2;
+    padding: 0;
+  }
+
+  /* Price — row 2, col 2 */
+  .editor-table td.col-price {
+    grid-column: 2;
+    grid-row: 2;
+    padding: 0;
+  }
+
+  /* Total — row 2, col 3 */
+  .editor-table td.col-total {
+    grid-column: 3;
+    grid-row: 2;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--brand);
+    white-space: nowrap;
+  }
+
+  /* Delete — row 2, col 4 */
+  .editor-table td.col-del {
+    grid-column: 4;
+    grid-row: 2;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Hide margin, unit, listino columns */
+  .editor-table td.col-margin,
+  .editor-table td.col-unit,
+  .editor-table td.col-listino { display: none; }
+
+  /* Delete button always visible on mobile */
+  .row-delete-btn {
+    color: var(--text-muted) !important;
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 8px;
+  }
+
+  /* Bigger inputs on mobile */
+  .cell-input {
+    min-height: 44px;
+    font-size: 16px; /* prevents iOS zoom */
+    padding: 10px 10px;
+  }
+
+  /* Add data labels before inputs */
+  .editor-table td.col-qty::before  { content: "Qtà"; display: block; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; font-weight: 600; }
+  .editor-table td.col-price::before { content: "Prezzo"; display: block; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; font-weight: 600; }
+  .editor-table td.col-total::before { content: "Tot."; display: block; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; font-weight: 600; }
+
+  /* Add row button */
+  .editor-add-row {
+    min-height: 48px;
+    font-size: 15px;
+    border-radius: 14px;
+    border: 1px dashed var(--border-strong);
+    background: transparent;
+    margin-top: 4px;
+  }
+
+  /* Summary full width */
   .editor-summary {
     align-self: stretch;
     min-width: 0;
-    padding-bottom: calc(12px + var(--sab));
   }
 
-  /* Meta bar */
-  .editor-meta-bar { padding: 10px 14px; }
-  .editor-meta-input { min-width: 0; flex: 1; }
+  .summary-row { padding: 12px 18px; font-size: 15px; }
+  .summary-total { padding: 16px 18px; font-size: 17px; }
 
-  /* --- Modals: bottom sheet --- */
+  /* ===== Modals — bottom sheet ===== */
   .modal-overlay {
     align-items: flex-end;
     padding: 0;
@@ -1820,6 +1978,11 @@ tr:hover .row-delete-btn { color: var(--text-muted); }
     animation: slideUp 250ms cubic-bezier(0.32, 0.72, 0, 1);
   }
 
+  .modal-form input { min-height: 48px; font-size: 16px; }
+
+  .modal-actions { flex-direction: column-reverse; }
+  .modal-actions .btn { width: 100%; min-height: 48px; justify-content: center; }
+
   .import-preview-card,
   .price-picker-card {
     width: 100%;
@@ -1830,23 +1993,90 @@ tr:hover .row-delete-btn { color: var(--text-muted); }
     animation: slideUp 250ms cubic-bezier(0.32, 0.72, 0, 1);
   }
 
-  /* --- Listino table --- */
-  .listino-table-wrap {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  /* ===== Listino — card stack on mobile ===== */
+  .listino-table-wrap { border: none; background: transparent; }
+
+  .listino-table { display: block; }
+  .listino-table thead { display: none; }
+  .listino-table tbody { display: flex; flex-direction: column; gap: 8px; }
+
+  .listino-row,
+  .listino-editing-row,
+  .listino-add-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--bg-1);
+    border: 1px solid var(--border) !important;
+    border-bottom: 1px solid var(--border) !important;
+    border-radius: 12px;
+    padding: 14px 16px;
   }
 
-  /* Hide category column on small screens */
-  .lt-col-cat { display: none; }
+  .listino-table td { padding: 0; display: block; }
 
-  /* --- Settings --- */
+  /* Always show category on mobile */
+  .lt-col-cat { display: block !important; }
+  .lt-col-price { text-align: left; }
+
+  /* Row with description + price side by side */
+  .listino-row td.lt-col-desc,
+  .listino-row td.lt-col-price {
+    display: inline-block;
+  }
+
+  .lt-col-actions {
+    text-align: left;
+    display: flex !important;
+    gap: 8px;
+  }
+
+  .lt-action-btn {
+    min-width: 40px;
+    min-height: 40px;
+    justify-content: center;
+    border-radius: 8px;
+  }
+
+  .lt-cell-input { min-height: 44px; font-size: 16px; padding: 10px; }
+
+  /* Search input bigger */
+  .listino-search { min-height: 48px; font-size: 16px; }
+
+  /* Header stacks on mobile */
+  .listino-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .listino-header-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .listino-header-actions .btn {
+    width: 100%;
+    min-height: 48px;
+    justify-content: center;
+  }
+
+  /* ===== Settings ===== */
   .settings-page { max-width: 100%; }
   .settings-card-header { padding: 16px 18px 12px; }
-  .settings-form { padding: 16px 18px; }
-  .settings-card-footer { padding: 12px 18px; }
+  .settings-form { padding: 16px 18px; gap: 14px; }
+  .settings-card-footer { padding: 12px 18px; flex-wrap: wrap; gap: 10px; }
+  .settings-card-footer .btn { flex: 1; min-height: 48px; justify-content: center; font-size: 15px; }
 
-  /* --- Auth page --- */
+  .settings-field input { min-height: 48px; font-size: 16px; }
+
+  /* ===== Auth ===== */
   .auth-card { padding: 24px 20px; }
+  .auth-form input, .auth-card input { min-height: 52px; font-size: 16px; }
+  .auth-form .btn[type="submit"] { min-height: 52px; font-size: 16px; }
+
+  /* ===== Upload zone ===== */
+  .upload-zone { padding: 32px 20px; min-height: 120px; }
 }
 
 /* Bottom sheet slide-up animation */

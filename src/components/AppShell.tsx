@@ -37,7 +37,8 @@ export function AppShell({ section, onSectionChange, children }: AppShellProps) 
           <Logo size="sm" />
         </div>
 
-        <nav className="app-nav">
+        {/* Desktop nav — hidden on mobile, replaced by bottom nav */}
+        <nav className="app-nav app-nav-desktop">
           {navItems.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
@@ -78,6 +79,20 @@ export function AppShell({ section, onSectionChange, children }: AppShellProps) 
       <main className="app-content">
         {children}
       </main>
+
+      {/* Mobile bottom navigation bar */}
+      <nav className="app-bottom-nav">
+        {navItems.map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            className={`app-bottom-nav-item ${section === id ? "active" : ""}`}
+            onClick={() => onSectionChange(id)}
+          >
+            <Icon size={22} />
+            <span>{label}</span>
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }

@@ -1,5 +1,3 @@
-import Anthropic from "npm:@anthropic-ai/sdk@0.52.0";
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -33,32 +31,54 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    const client = new Anthropic({ apiKey: Deno.env.get("ANTHROPIC_API_KEY") });
+    const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!apiKey) {
+      return new Response(JSON.stringify({ error: "ANTHROPIC_API_KEY not set" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
-    const message = await client.messages.create({
-      model: "claude-opus-4-7",
-      max_tokens: 4096,
-      system: SYSTEM,
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "document",
-              source: { type: "base64", media_type: "application/pdf", data: pdfBase64 },
-            },
-            {
-              type: "text",
-              text: "Estrai tutte le voci di lavoro da questo computo metrico.",
-            },
-          ],
-        },
-      ],
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "claude-opus-4-7",
+        max_tokens: 4096,
+        system: SYSTEM,
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "document",
+                source: { type: "base64", media_type: "application/pdf", data: pdfBase64 },
+              },
+              {
+                type: "text",
+                text: "Estrai tutte le voci di lavoro da questo computo metrico.",
+              },
+            ],
+          },
+        ],
+      }),
     });
 
-    const text = message.content.find((b) => b.type === "text")?.text ?? "{}";
+    if (!response.ok) {
+      const errText = await response.text();
+      return new Response(JSON.stringify({ error: `Anthropic API error: ${response.status} ${errText}` }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
-    // Strip markdown code fences if present
+    const result = await response.json();
+    const text = result.content?.find((b: { type: string }) => b.type === "text")?.text ?? "{}";
+
     const json = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
     const parsed = JSON.parse(json);
 
