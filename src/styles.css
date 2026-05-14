@@ -2289,3 +2289,21 @@ tr:hover .row-delete-btn { color: var(--text-muted); }
 
 [data-theme="light"] .import-preview-table th { background: #f8fafc; border-color: var(--border); }
 [data-theme="light"] .import-preview-table td { border-color: var(--border); color: var(--text); }
+
+/* Light theme form elements and backgrounds */
+[data-theme="light"] .bg-card { background-color: #f5f7fa; }
+[data-theme="light"] select { background-color: #ffffff; color: var(--text); border-color: var(--border); }
+[data-theme="light"] input[type="text"],
+[data-theme="light"] input[type="number"],
+[data-theme="light"] input[type="file"] { background-color: #ffffff; color: var(--text); border-color: var(--border); }
+[data-theme="light"] input::placeholder { color: var(--text-muted); }
+[data-theme="light"] label { color: var(--text); }
+
+/* Light theme upload box */
+[data-theme="light"] label[class*="border-dashed"] {
+  background-color: #f8fafc;
+  border-color: var(--border-strong);
+}
+[data-theme="light"] label[class*="border-dashed"]:hover {
+  border-color: var(--brand);
+}
