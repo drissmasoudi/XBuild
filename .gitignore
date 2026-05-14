@@ -8,6 +8,11 @@ dist/
 .env
 .env.local
 .env.*.local
+.env.*
+
+# API keys
+sk-ant-*
+sk-*
 
 # TypeScript build cache
 *.tsbuildinfo
