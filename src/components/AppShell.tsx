@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FileText, List, Settings, LogOut, ChevronDown, Sun, Moon } from "lucide-react";
+import { FileText, List, Settings, LogOut, ChevronDown, Sun, Moon, Upload } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 
-export type AppSection = "preventivi" | "listino" | "impostazioni";
+export type AppSection = "preventivi" | "listino" | "documenti" | "impostazioni";
 
 const navItems: { id: AppSection; label: string; icon: React.ElementType }[] = [
   { id: "preventivi", label: "Preventivi", icon: FileText },
   { id: "listino",    label: "Listino",    icon: List },
+  { id: "documenti",  label: "Documenti",  icon: Upload },
   { id: "impostazioni", label: "Impostazioni", icon: Settings },
 ];
 

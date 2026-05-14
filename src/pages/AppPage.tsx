@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AppShell, type AppSection } from "@/components/AppShell";
 import { QuotesList } from "@/components/quotes/QuotesList";
 import { PriceList } from "@/components/listino/PriceList";
+import { DocumentsPage } from "@/pages/DocumentsPage";
 import { SettingsPage } from "@/components/settings/SettingsPage";
 
 export default function AppPage() {
@@ -11,6 +12,7 @@ export default function AppPage() {
     <AppShell section={section} onSectionChange={setSection}>
       {section === "preventivi" && <QuotesList />}
       {section === "listino" && <PriceList />}
+      {section === "documenti" && <DocumentsPage />}
       {section === "impostazioni" && <SettingsPage />}
     </AppShell>
   );
