@@ -21,7 +21,6 @@ export function SplashScreen({ onDone }: Props) {
     <div className={`splash-screen splash-${phase}`}>
       <div className="splash-content">
         <img src={logoImg} alt="XBuild" className="splash-logo" />
-        <span className="splash-wordmark">XBuild</span>
       </div>
     </div>
   );
