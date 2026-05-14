@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, Save, Upload, BookOpen } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Save, Upload, BookOpen, Download } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
 import { useQuoteEditor } from "@/hooks/useQuoteEditor";
 import { usePriceList } from "@/hooks/usePriceList";
 import { useProfile } from "@/hooks/useProfile";
+import { useToast } from "@/hooks/useToast";
 import { Logo } from "@/components/Logo";
 import { UploadZone } from "@/components/quotes/UploadZone";
 import { ImportPreview } from "@/components/quotes/ImportPreview";
 import { QuotePdf } from "@/components/quotes/QuotePdf";
 import { PricePicker } from "@/components/listino/PricePicker";
 import { parseExcelFile, parsePdfViaAI, parsedRowToItem } from "@/lib/parseExcel";
+import { exportQuoteToExcel } from "@/lib/exportExcel";
 import type { PriceItem, QuoteStatus } from "@/types/quote";
 import { formatQuoteNumber } from "@/types/quote";
 import type { ParsedRow } from "@/lib/parseExcel";
@@ -29,10 +31,11 @@ function fmt(n: number) {
 export default function QuoteEditorPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { quote, items, loading, error, addItem, updateItem, deleteItem, updateQuote, itemTotal } =
+  const { quote, items, loading, error, addItem, addItems, updateItem, deleteItem, updateQuote, itemTotal } =
     useQuoteEditor(id!);
   const { items: priceItems } = usePriceList();
   const { profile } = useProfile();
+  const { addToast } = useToast();
 
   const [previewRows, setPreviewRows]     = useState<ParsedRow[] | null>(null);
   const [previewFile, setPreviewFile]     = useState("");
@@ -60,8 +63,21 @@ export default function QuoteEditorPage() {
       a.download = `${quote.title.replace(/\s+/g, "_")}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
+      addToast("PDF esportato con successo", "success");
+    } catch (err) {
+      addToast(err instanceof Error ? err.message : "Errore nell'esportazione", "error");
     } finally {
       setExporting(false);
+    }
+  };
+
+  const handleExportExcel = () => {
+    if (!quote) return;
+    try {
+      exportQuoteToExcel(quote, items);
+      addToast("Excel esportato con successo", "success");
+    } catch (err) {
+      addToast(err instanceof Error ? err.message : "Errore nell'esportazione", "error");
     }
   };
 
@@ -94,12 +110,22 @@ export default function QuoteEditorPage() {
 
   const handleImport = async (rows: ParsedRow[]) => {
     setImporting(true);
-    for (let i = 0; i < rows.length; i++) {
-      const pos = items.length + i;
-      await addItem(parsedRowToItem(rows[i]), pos);
+    try {
+      const itemsToAdd = rows.map((row) => ({
+        ...parsedRowToItem(row),
+        margin: profile?.default_margin ?? 0,
+      }));
+      await addItems(itemsToAdd, items.length);
+      addToast(`${rows.length} righe importate con successo`, "success");
+      setPreviewRows(null);
+    } catch (err) {
+      addToast(
+        err instanceof Error ? err.message : "Errore nell'importazione",
+        "error"
+      );
+    } finally {
+      setImporting(false);
     }
-    setPreviewRows(null);
-    setImporting(false);
   };
 
   if (loading) return <div className="centered">Caricamento...</div>;
@@ -148,6 +174,9 @@ export default function QuoteEditorPage() {
             <input type="file" accept=".xlsx,.xls,.csv,.pdf" style={{ display: "none" }}
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = ""; }} />
           </label>
+          <button className="btn btn-ghost btn-sm" onClick={handleExportExcel} disabled={exporting || items.length === 0}>
+            <Download size={14} /> Esporta Excel
+          </button>
           <button className="btn btn-primary btn-sm" onClick={handleExportPdf} disabled={exporting || items.length === 0}>
             <Save size={14} /> {exporting ? "Generazione..." : "Esporta PDF"}
           </button>

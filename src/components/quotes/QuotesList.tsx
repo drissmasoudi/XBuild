@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Trash2, FileText, Calendar, User, Copy } from "lucide-react";
+import { Plus, Trash2, FileText, Calendar, User, Copy, Search } from "lucide-react";
 import { useQuotes } from "@/hooks/useQuotes";
 import { NewQuoteModal } from "./NewQuoteModal";
 import type { NewQuote, Quote, QuoteStatus } from "@/types/quote";
@@ -33,7 +33,17 @@ export function QuotesList() {
   const [showModal, setShowModal]       = useState(false);
   const [deletingId, setDeletingId]     = useState<string | null>(null);
   const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm]     = useState("");
+  const [statusFilter, setStatusFilter] = useState<QuoteStatus | "all">("all");
   const navigate = useNavigate();
+
+  const filteredQuotes = quotes.filter((q) => {
+    const matchesSearch = !searchTerm ||
+      q.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      q.client_name?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "all" || q.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   const handleCreate = async (input: NewQuote) => {
     const q = await createQuote(input);
@@ -72,23 +82,54 @@ export function QuotesList() {
 
       {error && <p className="error">{error}</p>}
 
+      {quotes.length > 0 && (
+        <div className="quotes-filters">
+          <div className="quotes-search">
+            <Search size={16} />
+            <input
+              type="text"
+              placeholder="Cerca per titolo o cliente..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as QuoteStatus | "all")}
+            className="status-filter-select"
+          >
+            <option value="all">Tutti gli stati</option>
+            {Object.entries(STATUS_LABELS).map(([key, label]) => (
+              <option key={key} value={key}>{label}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {loading ? (
         <div className="quotes-loading">
           {[1, 2, 3].map((i) => <div key={i} className="quote-card skeleton" />)}
         </div>
-      ) : quotes.length === 0 ? (
+      ) : filteredQuotes.length === 0 ? (
         <div className="quotes-empty">
           <FileText size={48} strokeWidth={1.2} />
-          <h3>Nessun preventivo</h3>
-          <p>Crea il tuo primo preventivo per iniziare.</p>
-          <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-            <Plus size={16} />
-            Nuovo preventivo
-          </button>
+          <h3>{quotes.length === 0 ? "Nessun preventivo" : "Nessun risultato"}</h3>
+          <p>
+            {quotes.length === 0
+              ? "Crea il tuo primo preventivo per iniziare."
+              : "Nessun preventivo corrisponde ai filtri selezionati."}
+          </p>
+          {quotes.length === 0 && (
+            <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+              <Plus size={16} />
+              Nuovo preventivo
+            </button>
+          )}
         </div>
       ) : (
         <div className="quotes-grid">
-          {quotes.map((q) => (
+          {filteredQuotes.map((q) => (
             <div key={q.id} className="quote-card">
               <div className="quote-card-top">
                 <div className="quote-card-top-left">

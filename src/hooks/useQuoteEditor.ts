@@ -46,6 +46,32 @@ export function useQuoteEditor(quoteId: string) {
     });
   };
 
+  const addItems = async (rows: Partial<Omit<QuoteItem, "id" | "quote_id">>[], startPos: number = 0) => {
+    const itemsToInsert = rows.map((row, idx) => ({
+      quote_id: quoteId,
+      description: row.description ?? "",
+      quantity: row.quantity ?? 1,
+      unit: row.unit ?? "",
+      unit_price: row.unit_price ?? 0,
+      margin: row.margin ?? 0,
+      position: startPos + idx,
+    }));
+
+    const { data, error } = await supabase
+      .from("quote_items")
+      .insert(itemsToInsert)
+      .select();
+
+    if (error) { setError(error.message); return; }
+    if (!data) return;
+
+    setItems((prev) => {
+      const next = [...prev, ...data];
+      syncTotal(next);
+      return next;
+    });
+  };
+
   const updateItem = async (id: string, changes: QuoteItemUpdate) => {
     setItems((prev) => {
       const next = prev.map((i) => (i.id === id ? { ...i, ...changes } : i));
@@ -67,5 +93,5 @@ export function useQuoteEditor(quoteId: string) {
     setQuote((q) => q ? { ...q, ...changes } : q);
   };
 
-  return { quote, items, loading, error, addItem, updateItem, deleteItem, updateQuote, itemTotal };
+  return { quote, items, loading, error, addItem, addItems, updateItem, deleteItem, updateQuote, itemTotal };
 }
