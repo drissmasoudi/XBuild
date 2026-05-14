@@ -2195,12 +2195,12 @@ tr:hover .row-delete-btn { color: var(--text-muted); }
 /* ===== Light theme ===== */
 [data-theme="light"] {
   color-scheme: light;
-  --bg-0: #f0f2f5;
+  --bg-0: #ffffff;
   --bg-1: #ffffff;
-  --bg-2: #e8ecf0;
-  --bg-card-alt: rgba(240, 242, 245, 0.8);
-  --border: rgba(15, 23, 42, 0.10);
-  --border-strong: rgba(15, 23, 42, 0.18);
+  --bg-2: #ffffff;
+  --bg-card-alt: #ffffff;
+  --border: rgba(15, 23, 42, 0.08);
+  --border-strong: rgba(15, 23, 42, 0.15);
   --text: #0f172a;
   --text-muted: #64748b;
   --danger: #dc2626;
@@ -2310,7 +2310,7 @@ tr:hover .row-delete-btn { color: var(--text-muted); }
 [data-theme="light"] .import-preview-table td { border-color: var(--border); color: var(--text); }
 
 /* Light theme form elements and backgrounds */
-[data-theme="light"] .bg-card { background-color: #f5f7fa; }
+[data-theme="light"] .bg-card { background-color: #ffffff; }
 [data-theme="light"] select { background-color: #ffffff; color: var(--text); border-color: var(--border); }
 [data-theme="light"] input[type="text"],
 [data-theme="light"] input[type="number"],
@@ -2320,10 +2320,10 @@ tr:hover .row-delete-btn { color: var(--text-muted); }
 
 /* Light theme upload box */
 [data-theme="light"] .document-upload-input {
-  background-color: #f5f7fa;
-  border-color: #cbd5e1;
+  background-color: #ffffff;
+  border-color: var(--border-strong);
 }
 [data-theme="light"] .document-upload-input:hover {
   border-color: var(--brand);
-  background-color: #eff6ff;
+  background-color: #ffffff;
 }
