@@ -10,6 +10,12 @@ export default {
       }
     },
     extend: {
+      spacing: {
+        "dvh-screen": "100dvh"
+      },
+      minHeight: {
+        screen: "100dvh"
+      },
       colors: {
         border: "rgba(148, 163, 184, 0.28)",
         background: "#05060b",

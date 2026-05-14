@@ -8,8 +8,8 @@ export default function AuthPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(import.meta.env.VITE_DEV_EMAIL ?? "");
+  const [password, setPassword] = useState(import.meta.env.VITE_DEV_PASSWORD ?? "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);

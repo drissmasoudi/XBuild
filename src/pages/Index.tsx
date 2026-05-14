@@ -54,8 +54,8 @@ const Index = () => {
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Button asChild size="lg" className="h-12 px-8 bg-gradient-to-r from-primary to-primary-glow text-primary-foreground shadow-glow text-base">
-              <Link to={ctaTo}>
-                Inizia ora <ArrowRight className="ml-2 h-4 w-4" />
+              <Link to={ctaTo} className="inline-flex items-center gap-1">
+                Inizia ora <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
             <p className="text-sm text-muted-foreground">Nessuna carta di credito richiesta</p>
