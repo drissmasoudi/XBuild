@@ -1212,6 +1212,25 @@ tr:hover .row-delete-btn { color: var(--text-muted); }
   transition: color 180ms;
 }
 
+/* Document upload file input box */
+.document-upload-input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 16px;
+  border: 2px dashed var(--border-strong);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.document-upload-input:hover {
+  border-color: var(--brand);
+  background: rgba(255, 106, 0, 0.02);
+}
+
 .upload-zone:hover .upload-zone-icon,
 .upload-zone.drag-over .upload-zone-icon {
   color: var(--brand);
@@ -2300,10 +2319,11 @@ tr:hover .row-delete-btn { color: var(--text-muted); }
 [data-theme="light"] label { color: var(--text); }
 
 /* Light theme upload box */
-[data-theme="light"] label[class*="border-dashed"] {
-  background-color: #f8fafc;
-  border-color: var(--border-strong);
+[data-theme="light"] .document-upload-input {
+  background-color: #f5f7fa;
+  border-color: #cbd5e1;
 }
-[data-theme="light"] label[class*="border-dashed"]:hover {
+[data-theme="light"] .document-upload-input:hover {
   border-color: var(--brand);
+  background-color: #eff6ff;
 }
