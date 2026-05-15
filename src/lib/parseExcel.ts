@@ -76,16 +76,44 @@ export function parseExcelFile(file: File): Promise<ParsedRow[]> {
   });
 }
 
+const TEXT_THRESHOLD = 100;
+
+async function extractTextFromPdf(buffer: ArrayBuffer): Promise<string> {
+  const pdfjsLib = await import("pdfjs-dist");
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
+  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(buffer) }).promise;
+  const pages: string[] = [];
+
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    pages.push(content.items.map((item) => ("str" in item ? item.str : "")).join(" "));
+  }
+
+  return pages.join("\n").trim();
+}
+
 export async function parsePdfViaAI(file: File): Promise<ParsedRow[]> {
   const buffer = await file.arrayBuffer();
-  const bytes = new Uint8Array(buffer);
-  let binary = "";
-  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-  const pdfBase64 = btoa(binary);
 
-  const { data, error } = await supabase.functions.invoke("extract-pdf", {
-    body: { pdfBase64 },
-  });
+  let body: { pdfText?: string; pdfBase64?: string };
+
+  try {
+    const text = await extractTextFromPdf(buffer);
+    if (text.length >= TEXT_THRESHOLD) {
+      body = { pdfText: text };
+    } else {
+      throw new Error("testo insufficiente");
+    }
+  } catch {
+    const bytes = new Uint8Array(buffer);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    body = { pdfBase64: btoa(binary) };
+  }
+
+  const { data, error } = await supabase.functions.invoke("extract-pdf", { body });
 
   if (error) throw new Error(error.message);
   if (!data?.rows || !Array.isArray(data.rows)) throw new Error("Risposta AI non valida");

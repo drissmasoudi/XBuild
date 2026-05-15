@@ -23,9 +23,9 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { pdfBase64 } = await req.json();
-    if (!pdfBase64) {
-      return new Response(JSON.stringify({ error: "pdfBase64 required" }), {
+    const { pdfBase64, pdfText } = await req.json();
+    if (!pdfBase64 && !pdfText) {
+      return new Response(JSON.stringify({ error: "pdfBase64 or pdfText required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -39,6 +39,42 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    let model: string;
+    let max_tokens: number;
+    let messages: unknown[];
+
+    if (pdfText) {
+      console.log("Percorso 1: testo estratto dal client");
+      model = "claude-haiku-4-5";
+      max_tokens = 2048;
+      const truncated = pdfText.slice(0, 30000);
+      messages = [
+        {
+          role: "user",
+          content: `Analizza il seguente testo di un computo metrico ed estrai le voci di lavoro.\n\n${truncated}`,
+        },
+      ];
+    } else {
+      console.log("Percorso 2: PDF scansionato/immagine, uso Sonnet con vision");
+      model = "claude-sonnet-4-5";
+      max_tokens = 4096;
+      messages = [
+        {
+          role: "user",
+          content: [
+            {
+              type: "document",
+              source: { type: "base64", media_type: "application/pdf", data: pdfBase64 },
+            },
+            {
+              type: "text",
+              text: "Estrai tutte le voci di lavoro da questo computo metrico.",
+            },
+          ],
+        },
+      ];
+    }
+
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -46,26 +82,7 @@ Deno.serve(async (req: Request) => {
         "anthropic-version": "2023-06-01",
         "content-type": "application/json",
       },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-5",
-        max_tokens: 4096,
-        system: SYSTEM,
-        messages: [
-          {
-            role: "user",
-            content: [
-              {
-                type: "document",
-                source: { type: "base64", media_type: "application/pdf", data: pdfBase64 },
-              },
-              {
-                type: "text",
-                text: "Estrai tutte le voci di lavoro da questo computo metrico.",
-              },
-            ],
-          },
-        ],
-      }),
+      body: JSON.stringify({ model, max_tokens, system: SYSTEM, messages }),
     });
 
     if (!response.ok) {
