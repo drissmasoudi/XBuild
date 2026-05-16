@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import Index from "@/pages/Index";
 import AuthPage from "@/pages/AuthPage";
 import AppPage from "@/pages/AppPage";
@@ -53,6 +54,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <ToastContainer />
+      <Analytics />
     </ToastProvider>
   );
 }
