@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useAppCache } from "@/lib/store";
 
 export interface Profile {
   id: string;
@@ -19,13 +20,15 @@ const EMPTY: Omit<Profile, "id"> = {
 };
 
 export function useProfile() {
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const cached = useAppCache((s) => s.profile);
+  const setCache = useAppCache((s) => s.setProfile);
+
+  const [profile, setProfile] = useState<Profile | null>(cached);
+  const [loading, setLoading] = useState(cached === null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetch = useCallback(async () => {
-    setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setLoading(false); return; }
 
@@ -36,9 +39,11 @@ export function useProfile() {
       .maybeSingle();
 
     if (error) { setError(error.message); setLoading(false); return; }
-    setProfile(data ?? { id: user.id, ...EMPTY });
+    const p = data ?? { id: user.id, ...EMPTY };
+    setProfile(p);
+    setCache(p);
     setLoading(false);
-  }, []);
+  }, [setCache]);
 
   useEffect(() => { fetch(); }, [fetch]);
 
@@ -52,6 +57,7 @@ export function useProfile() {
       .upsert({ ...next, updated_at: new Date().toISOString() });
     if (error) { setError(error.message); setSaving(false); return false; }
     setProfile(next);
+    setCache(next);
     setSaving(false);
     return true;
   };

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+import { useAppCache } from "@/lib/store";
 
 type AuthContextType = {
   user: User | null;
@@ -43,6 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       session,
       loading,
       signOut: async () => {
+        useAppCache.getState().clear();
         await supabase.auth.signOut();
       }
     }),

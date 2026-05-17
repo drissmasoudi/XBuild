@@ -1,23 +1,29 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useAppCache } from "@/lib/store";
 import type { NewQuote, Quote } from "@/types/quote";
 
 export function useQuotes() {
-  const [quotes, setQuotes] = useState<Quote[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cached = useAppCache((s) => s.quotes);
+  const setCache = useAppCache((s) => s.setQuotes);
+
+  const [quotes, setQuotes] = useState<Quote[]>(cached ?? []);
+  const [loading, setLoading] = useState(cached === null);
   const [error, setError] = useState<string | null>(null);
 
   const fetchQuotes = useCallback(async () => {
-    setLoading(true);
     const { data, error } = await supabase
       .from("quotes")
       .select("*")
       .order("created_at", { ascending: false });
 
     if (error) setError(error.message);
-    else setQuotes(data ?? []);
+    else {
+      setQuotes(data ?? []);
+      setCache(data ?? []);
+    }
     setLoading(false);
-  }, []);
+  }, [setCache]);
 
   useEffect(() => { fetchQuotes(); }, [fetchQuotes]);
 
@@ -32,14 +38,18 @@ export function useQuotes() {
       .single();
 
     if (error) { setError(error.message); return null; }
-    setQuotes((prev) => [data, ...prev]);
+    const next = [data, ...quotes];
+    setQuotes(next);
+    setCache(next);
     return data;
   };
 
   const deleteQuote = async (id: string) => {
     const { error } = await supabase.from("quotes").delete().eq("id", id);
     if (error) { setError(error.message); return; }
-    setQuotes((prev) => prev.filter((q) => q.id !== id));
+    const next = quotes.filter((q) => q.id !== id);
+    setQuotes(next);
+    setCache(next);
   };
 
   const duplicateQuote = async (id: string): Promise<Quote | null> => {
@@ -68,7 +78,9 @@ export function useQuotes() {
       newQuote.total = total;
     }
 
-    setQuotes((prev) => [newQuote, ...prev]);
+    const next = [newQuote, ...quotes];
+    setQuotes(next);
+    setCache(next);
     return newQuote;
   };
 

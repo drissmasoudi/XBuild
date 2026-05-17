@@ -1,23 +1,29 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useAppCache } from "@/lib/store";
 import type { PriceItem, NewPriceItem } from "@/types/quote";
 
 export function usePriceList() {
-  const [items, setItems] = useState<PriceItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cached = useAppCache((s) => s.priceItems);
+  const setCache = useAppCache((s) => s.setPriceItems);
+
+  const [items, setItems] = useState<PriceItem[]>(cached ?? []);
+  const [loading, setLoading] = useState(cached === null);
   const [error, setError] = useState<string | null>(null);
 
   const fetch = useCallback(async () => {
-    setLoading(true);
     const { data, error } = await supabase
       .from("price_items")
       .select("*")
       .order("category")
       .order("description");
     if (error) setError(error.message);
-    else setItems(data ?? []);
+    else {
+      setItems(data ?? []);
+      setCache(data ?? []);
+    }
     setLoading(false);
-  }, []);
+  }, [setCache]);
 
   useEffect(() => { fetch(); }, [fetch]);
 
@@ -30,20 +36,26 @@ export function usePriceList() {
       .select()
       .single();
     if (error) { setError(error.message); return null; }
-    setItems((prev) => [...prev, data].sort((a, b) => a.description.localeCompare(b.description)));
+    const next = [...items, data].sort((a, b) => a.description.localeCompare(b.description));
+    setItems(next);
+    setCache(next);
     return data;
   };
 
   const updateItem = async (id: string, changes: Partial<NewPriceItem>) => {
     const { error } = await supabase.from("price_items").update(changes).eq("id", id);
     if (error) { setError(error.message); return; }
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...changes } : i)));
+    const next = items.map((i) => (i.id === id ? { ...i, ...changes } : i));
+    setItems(next);
+    setCache(next);
   };
 
   const deleteItem = async (id: string) => {
     const { error } = await supabase.from("price_items").delete().eq("id", id);
     if (error) { setError(error.message); return; }
-    setItems((prev) => prev.filter((i) => i.id !== id));
+    const next = items.filter((i) => i.id !== id);
+    setItems(next);
+    setCache(next);
   };
 
   const importItems = async (rows: NewPriceItem[]) => {
@@ -52,7 +64,9 @@ export function usePriceList() {
     const payload = rows.map((r) => ({ ...r, user_id: user.id }));
     const { data, error } = await supabase.from("price_items").insert(payload).select();
     if (error) { setError(error.message); return; }
-    setItems((prev) => [...prev, ...(data ?? [])].sort((a, b) => a.description.localeCompare(b.description)));
+    const next = [...items, ...(data ?? [])].sort((a, b) => a.description.localeCompare(b.description));
+    setItems(next);
+    setCache(next);
   };
 
   return { items, loading, error, addItem, updateItem, deleteItem, importItems, refetch: fetch };

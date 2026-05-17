@@ -1,15 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useAppCache } from "@/lib/store";
 import type { Document } from "@/types/document";
 
 export function useDocuments() {
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cached = useAppCache((s) => s.documents);
+  const setCache = useAppCache((s) => s.setDocuments);
+
+  const [documents, setDocuments] = useState<Document[]>(cached ?? []);
+  const [loading, setLoading] = useState(cached === null);
   const [error, setError] = useState<string | null>(null);
 
   const fetchDocuments = useCallback(async () => {
     try {
-      setLoading(true);
       setError(null);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
@@ -21,16 +24,15 @@ export function useDocuments() {
         .order("created_at", { ascending: false });
 
       if (err) throw err;
-      console.log("Fetched documents:", data);
       setDocuments(data || []);
+      setCache(data || []);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch documents";
-      console.error("fetchDocuments error:", message);
       setError(message);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [setCache]);
 
   useEffect(() => {
     fetchDocuments();
@@ -48,8 +50,6 @@ export function useDocuments() {
 
       const filename = `${Date.now()}_${file.name}`;
       const filepath = `documents/${user.id}/${filename}`;
-
-      console.log("Uploading document:", { filepath, type, size: file.size });
 
       const { error: uploadErr } = await supabase.storage
         .from("documents")
@@ -73,13 +73,13 @@ export function useDocuments() {
         .single();
 
       if (insertErr) throw insertErr;
-      console.log("Document created:", doc);
 
-      setDocuments((prev) => [doc, ...prev]);
+      const next = [doc, ...documents];
+      setDocuments(next);
+      setCache(next);
       return doc;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Upload failed";
-      console.error("uploadDocument error:", message);
       setError(message);
       throw err;
     }
@@ -90,8 +90,6 @@ export function useDocuments() {
       setError(null);
       const doc = documents.find((d) => d.id === id);
       if (!doc) throw new Error("Document not found");
-
-      console.log("Deleting document:", id);
 
       const { error: storageErr } = await supabase.storage
         .from("documents")
@@ -106,11 +104,11 @@ export function useDocuments() {
 
       if (dbErr) throw dbErr;
 
-      setDocuments((prev) => prev.filter((d) => d.id !== id));
-      console.log("Document deleted:", id);
+      const next = documents.filter((d) => d.id !== id);
+      setDocuments(next);
+      setCache(next);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Delete failed";
-      console.error("deleteDocument error:", message);
       setError(message);
       throw err;
     }

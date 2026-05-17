@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { useNavigate } from "react-router-dom";
 
 export function SettingsPage() {
-  const { profile, loading, saving, error, save } = useProfile();
+  const { profile, saving, error, save } = useProfile();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -56,8 +56,6 @@ export function SettingsPage() {
   };
 
   const handleLogout = async () => { await signOut(); navigate("/"); };
-
-  if (loading) return <div className="settings-loading">Caricamento...</div>;
 
   return (
     <div className="settings-page">
