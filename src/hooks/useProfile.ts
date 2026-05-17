@@ -1,15 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAppCache } from "@/lib/store";
-
-export interface Profile {
-  id: string;
-  company_name: string;
-  vat_number: string;
-  address: string;
-  phone: string;
-  default_margin: number;
-}
+import type { Profile } from "@/lib/store";
+export type { Profile } from "@/lib/store";
 
 const EMPTY: Omit<Profile, "id"> = {
   company_name: "",

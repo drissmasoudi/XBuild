@@ -1,12 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppShell, type AppSection } from "@/components/AppShell";
 import { QuotesList } from "@/components/quotes/QuotesList";
 import { PriceList } from "@/components/listino/PriceList";
 import { DocumentsPage } from "@/pages/DocumentsPage";
 import { SettingsPage } from "@/components/settings/SettingsPage";
+import { useAppCache } from "@/lib/store";
 
 export default function AppPage() {
   const [section, setSection] = useState<AppSection>("preventivi");
+  const prefetchAll = useAppCache((s) => s.prefetchAll);
+
+  useEffect(() => { prefetchAll(); }, [prefetchAll]);
 
   return (
     <AppShell section={section} onSectionChange={setSection}>
@@ -15,15 +19,5 @@ export default function AppPage() {
       {section === "documenti" && <DocumentsPage />}
       {section === "impostazioni" && <SettingsPage />}
     </AppShell>
-  );
-}
-
-function ImpostazioniPlaceholder() {
-  return (
-    <div className="app-placeholder">
-      <div className="app-placeholder-icon">⚙️</div>
-      <h2>Impostazioni</h2>
-      <p>Configura il tuo profilo e le preferenze dell'app.</p>
-    </div>
   );
 }
